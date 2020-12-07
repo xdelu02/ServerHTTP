@@ -8,9 +8,17 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Date;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 public class ClientHandler implements Runnable{
 	private final String pathToFiles = Paths.get(".").toAbsolutePath()+"/src/main/java/DeLuca/serverHTTP/files/";
@@ -48,20 +56,31 @@ public class ClientHandler implements Runnable{
 	        	
 		        else if(requestedPath.equals("/es/i.html") || requestedPath.equals("/es/"))
 		        	sendResponse("200 OK", "text/html", getFileLength("es/i.html"), getFileContent("es/i.html"));
+		        
+		        else if(!requestedPath.contains(".")) 
+		        	redirect(requestedPath);
 	        	
 		        else if(requestedPath.equals("/punti-vendita.xml")) {
 		        	jsonToXml("punti-vendita");
 		        	sendResponse("200 OK", "text/xml", getFileLength("punti-vendita.xml"), getFileContent("punti-vendita.xml"));
 		        }
-		        else if(!requestedPath.contains(".")) 
-		        	redirect(requestedPath);
+	        	
+		        else if(requestedPath.equals("/db/persone.xml")) {
+		        	toXml(getPeopleListFromDatabase());
+		        	sendResponse("200 OK", "text/xml", getFileLength("/db/persone.xml"), getFileContent("/db/persone.xml"));
+		        }
+	        	
+		        else if(requestedPath.equals("/db/persone.json")) {
+		        	toJson(getPeopleListFromDatabase());
+		        	sendResponse("200 OK", "application/json", getFileLength("/db/persone.json"), getFileContent("/db/persone.json"));
+		        }
 	        		
 	        	else 
 	        		sendResponse("404 Not found", "text/html", getFileLength("error404.html"), getFileContent("error404.html"));
 				
-	        }else {
+	        }else
 	        	sendResponse("405 Method Not Allowed", "text/html", getFileLength("error405.html"), getFileContent("error405.html"));
-	        }
+	       
 		} catch (Exception e) {
 			return;
 		}
@@ -112,11 +131,37 @@ public class ClientHandler implements Runnable{
         clientOutput.close();
     }
 	
+	private ListaPersone getPeopleListFromDatabase() throws Exception {
+		ListaPersone listaPersone = new ListaPersone();
+		
+		Class.forName("com.mysql.cj.jdbc.Driver");
+		Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/esTPSIT", "root", "password");
+		Statement stmt = con.createStatement();
+		ResultSet rs = stmt.executeQuery("select * from persone");
+
+		while (rs.next()) {
+			listaPersone.addPersona(new Persona(rs.getInt(1), rs.getString(2), rs.getString(3)));
+		}
+		con.close();
+		return listaPersone;
+	}
+	
+	private void toXml(ListaPersone listaPersone) throws Exception {
+		XmlMapper x = new XmlMapper();
+		File xmlFile = new File(pathToFiles + "/db/persone.xml");
+		x.writeValue(xmlFile, listaPersone);
+	}
+
+	private void toJson(ListaPersone listaPersone) throws Exception {
+		File jsonFile = new File(pathToFiles + "/db/persone.json");
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.writeValue(jsonFile, listaPersone);
+	}
+	
 	private void jsonToXml (String file) throws Exception {
 		ObjectMapper o = new ObjectMapper();
 		PuntiVendita pv = o.readValue(getFileContent(file+".json"), PuntiVendita.class);
 		XmlMapper x = new XmlMapper();
-		//File xmlFile = new File(pathToFiles+file);
 		File xmlFile = new File(pathToFiles + file + ".xml");
 		x.writeValue(xmlFile, pv);
 	}
