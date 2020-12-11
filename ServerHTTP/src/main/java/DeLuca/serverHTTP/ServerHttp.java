@@ -8,7 +8,7 @@ public class ServerHttp {
 	
 	private ServerSocket serverSocket;
 	private Socket socket;
-	private final int port = 9090;
+	private final int port = 3000;
 
     public static void main( String[] args ) throws Exception {
     	new ServerHttp().start();
