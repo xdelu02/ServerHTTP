@@ -90,14 +90,14 @@
 		</pluginManagement>
 	</build>
 	<build>
-	    <finalName>MyApplication</finalName>
+	    <finalName>ServerHTTP</finalName>
 	    <plugins>
 		<plugin>
 	  <artifactId>maven-assembly-plugin</artifactId>
 	  <configuration>
 	    <archive>
 	      <manifest>
-		    <mainClass>Server.JavaHTTPServer</mainClass>
+		    <mainClass>DeLuca.serverHTTP.ServerHttp</mainClass>
 	      </manifest>
 	    </archive>
 	    <descriptorRefs>
