@@ -135,7 +135,7 @@ public class ClientHandler implements Runnable{
 		ListaPersone listaPersone = new ListaPersone();
 		
 		Class.forName("com.mysql.cj.jdbc.Driver");
-		Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/esTPSIT", "root", "password");
+		Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/esTPSIT", "root", "root");
 		Statement stmt = con.createStatement();
 		ResultSet rs = stmt.executeQuery("select * from persone");
 
