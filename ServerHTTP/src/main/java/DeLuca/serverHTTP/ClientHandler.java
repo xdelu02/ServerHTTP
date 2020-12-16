@@ -39,7 +39,7 @@ public class ClientHandler implements Runnable{
 	        
 			StringBuilder requestBuilder = new StringBuilder();
 	        String line;
-	        while (!(line = br.readLine()).isBlank()) {
+	        while (!(line = br.readLine()).isEmpty()) {
 	            requestBuilder.append(line + "\r\n");
 	        }
 
@@ -135,7 +135,7 @@ public class ClientHandler implements Runnable{
 		ListaPersone listaPersone = new ListaPersone();
 		
 		Class.forName("com.mysql.cj.jdbc.Driver");
-		Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/esTPIT", "root", "root");
+		Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/esTPIT", "root", "password");
 		Statement stmt = con.createStatement();
 		ResultSet rs = stmt.executeQuery("select * from persone");
 

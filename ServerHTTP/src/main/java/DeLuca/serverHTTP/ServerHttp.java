@@ -16,7 +16,7 @@ public class ServerHttp {
     
     private void start() {
     	try {
-    		System.out.println("Server sta ascoltando su porta 9090...\n");
+    		System.out.println("Server sta ascoltando su porta" +port +"...\n");
 			serverSocket = new ServerSocket(port);
 			
 			while(true) {
